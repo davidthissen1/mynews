@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt'); // For password hashing
 const pool = require('../db'); // Database connection
 const { check, validationResult } = require('express-validator');
+const jwt = require('jsonwebtoken');
 
 const router = express.Router();
 
@@ -53,5 +54,41 @@ router.post(
         }
     }
 );
+// Login User
+router.post('/login', async (req, res) => {
+    console.log('POST /login route hit');
+    console.log('Request Body:', req.body);
+    const { email, password } = req.body;
+
+    try {
+        // Check if the user exists
+        const user = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (user.rows.length === 0) {
+            return res.status(400).json({ error: 'Invalid credentials' });
+        }
+
+        // Compare the provided password with the stored hashed password
+        const isMatch = await bcrypt.compare(password, user.rows[0].password);
+        if (!isMatch) {
+            return res.status(400).json({ error: 'Invalid credentials' });
+        }
+
+        // Generate JWT token
+        const payload = {
+            user: {
+                id: user.rows[0].id, // Include user ID in the payload
+            },
+        };
+
+        const token = jwt.sign(payload, process.env.JWT_SECRET, {
+            expiresIn: '1h', // Token expires in 1 hour
+        });
+
+        res.json({ token }); // Return the token to the client
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+});
 
 module.exports = router;
