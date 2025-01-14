@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/auth'); // Adjust path if needed
 const newsRoutes = require('./routes/news');
+const preferencesRoutes = require("./routes/news");
 
 
 
@@ -15,6 +16,9 @@ app.use(express.json()); // Parse JSON request bodies
 // Mount the Auth Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/news', newsRoutes);
+
+app.use("/api/preferences", preferencesRoutes);
+
 
 // Test Route
 app.get('/', (req, res) => {
