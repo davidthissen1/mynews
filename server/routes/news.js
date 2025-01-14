@@ -96,4 +96,20 @@ router.get("/", authenticateToken, async (req, res) => {
     }
 });
 
+router.post("/interactions", authenticateToken, async (req, res) => {
+    const { articleId, action } = req.body; // Action: "click", "like", "dislike"
+    const userId = req.user.id;
+
+    try {
+        await pool.query(
+            "INSERT INTO interactions (user_id, article_id, action) VALUES ($1, $2, $3)",
+            [userId, articleId, action]
+        );
+        res.status(200).json({ message: "Interaction logged" });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: "Failed to log interaction" });
+    }
+});
+
 module.exports = router;
