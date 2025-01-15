@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import ArticleCard from "./ArticleCard"; // Ensure correct path to ArticleCard
+
 
 const NewsFeed = () => {
     const [articles, setArticles] = useState([]);
@@ -48,21 +50,18 @@ const NewsFeed = () => {
 
             {error && <p style={{ color: "red" }}>{error}</p>}
 
+            
             <div>
-                {articles.length > 0 ? (
-                    articles.map((article, index) => (
-                        <div key={index}>
-                            <h3>{article.title}</h3>
-                            <p>{article.summary}</p>
-                            <a href={article.url} target="_blank" rel="noopener noreferrer">
-                                Read More
-                            </a>
-                        </div>
-                    ))
-                ) : (
-                    <p>No articles available.</p>
-                )}
+            {articles.length > 0 ? (
+                articles.map((article, index) => (
+                    <ArticleCard key={article.url || index} article={article} />
+                ))
+            ) : (
+                <p>No articles available.</p>
+            )}
             </div>
+
+               
         </div>
     );
 };

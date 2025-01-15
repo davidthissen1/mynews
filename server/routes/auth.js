@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt"); // For password hashing
 const pool = require("../db"); // Database connection
 const { check, validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
+const authenticateToken = require("../middleware/authenticateToken");
+
 
 const router = express.Router();
 
@@ -94,5 +96,23 @@ router.post("/login", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+
+router.post("/", authenticateToken, async (req, res) => {
+    const { articleId, action } = req.body;
+    const userId = req.user.id;
+
+    try {
+        await pool.query(
+            "INSERT INTO interactions (user_id, article_id, interaction_type) VALUES ($1, $2, $3)",
+            [userId, articleId, action]
+        );
+        res.status(200).json({ message: "Interaction logged successfully" });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).json({ error: "Failed to log interaction" });
+    }
+});
+
 
 module.exports = router;

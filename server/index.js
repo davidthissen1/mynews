@@ -3,6 +3,8 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth'); // Adjust path if needed
 const newsRoutes = require('./routes/news');
 const preferencesRoutes = require("./routes/news");
+const interactionsRoutes = require('./routes/interactions');
+
 
 
 
@@ -18,6 +20,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/news', newsRoutes);
 
 app.use("/api/preferences", preferencesRoutes);
+app.use('/api/interactions', interactionsRoutes);
+
 
 
 // Test Route

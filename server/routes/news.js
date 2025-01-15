@@ -3,27 +3,8 @@ const pool = require('../db'); // Database connection
 const jwt = require('jsonwebtoken'); // To verify JWT
 const router = express.Router();
 const axios = require('axios');
+const authenticateToken = require("../middleware/authenticateToken");
 
-// Middleware to authenticate the user
-const authenticateToken = (req, res, next) => {
-    let token = req.header('Authorization');
-    console.log("Received token:", token); // Log the token received by the backend
-    if (!token) return res.status(401).json({ error: 'Access denied' });
-     // Remove "Bearer " prefix if it exists
-     if (token.startsWith("Bearer ")) {
-        token = token.slice(7, token.length).trimLeft(); // Remove "Bearer " and trim whitespace
-    }
-
-    try {
-        const verified = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = verified.user; // Add user info to request
-        console.log("Token verified, user:", req.user); // Log verified user
-        next();
-    } catch (err) {
-        console.error("Token verification failed:", err);
-        res.status(400).json({ error: 'Invalid token' });
-    }
-};
 
 router.post("/", authenticateToken, async (req, res) => {
     const { interests } = req.body;

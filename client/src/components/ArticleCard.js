@@ -3,7 +3,10 @@ import React from "react";
 
 const ArticleCard = ({ article }) => {
     const logInteraction = async (articleId, action) => {
+        console.log("Logging interaction:", "articleId=", articleId, ", action=", action);
+
         const token = localStorage.getItem("token");
+        console.log(`Logging interaction: articleId=${articleId}, action=${action}`); // Add this line
 
         try {
             const response = await fetch("http://localhost:5501/api/interactions", {
