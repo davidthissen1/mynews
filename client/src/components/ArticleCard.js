@@ -3,11 +3,15 @@ import React from "react";
 
 const ArticleCard = ({ article }) => {
     const logInteraction = async (articleId, action) => {
+        if (!articleId) {
+            console.error("Invalid articleId:", articleId);
+            return;
+        }
+    
         console.log("Logging interaction:", "articleId=", articleId, ", action=", action);
-
+    
         const token = localStorage.getItem("token");
-        console.log(`Logging interaction: articleId=${articleId}, action=${action}`); // Add this line
-
+    
         try {
             const response = await fetch("http://localhost:5501/api/interactions", {
                 method: "POST",
@@ -17,7 +21,7 @@ const ArticleCard = ({ article }) => {
                 },
                 body: JSON.stringify({ articleId, action }),
             });
-
+    
             if (!response.ok) {
                 console.error("Failed to log interaction");
             }
@@ -25,6 +29,7 @@ const ArticleCard = ({ article }) => {
             console.error("Error:", err);
         }
     };
+    
 
     return (
         <div className="article-card">
@@ -33,7 +38,7 @@ const ArticleCard = ({ article }) => {
             <button onClick={() => logInteraction(article.id, "like")}>Like</button>
             <button onClick={() => logInteraction(article.id, "dislike")}>Dislike</button>
             <a
-                href={article.url}
+                href={article.id}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => logInteraction(article.id, "click")}

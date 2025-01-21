@@ -68,8 +68,14 @@ router.get("/", authenticateToken, async (req, res) => {
         const responses = await Promise.all(promises);
 
         // Combine news articles from all categories
-        const articles = responses.flatMap((response) => response.data.articles);
-
+        const articles = responses.flatMap((response) =>
+            response.data.articles.map((article, index) => ({
+                ...article,
+                id: article.id || article.url || `unknown-${index}`,
+            }))
+        );
+        
+        
         res.json(articles);
     } catch (err) {
         console.error("Error fetching news:", err.message);

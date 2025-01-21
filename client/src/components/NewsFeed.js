@@ -24,6 +24,8 @@ const NewsFeed = () => {
 
                 if (response.ok) {
                     const data = await response.json();
+                    console.log("Articles from API:", data); // Add this line
+
                     setArticles(data);
                 } else {
                     const errorData = await response.json();
@@ -53,12 +55,19 @@ const NewsFeed = () => {
             
             <div>
             {articles.length > 0 ? (
-                articles.map((article, index) => (
-                    <ArticleCard key={article.url || index} article={article} />
-                ))
-            ) : (
-                <p>No articles available.</p>
-            )}
+    articles.map((article, index) => (
+        <ArticleCard 
+            key={article.url || `unknown-${index}`} // Use a unique fallback key
+            article={{
+                ...article,
+                id: article.id || article.url || `unknown-${index}`, // Ensure fallback for missing IDs
+            }}
+        />
+    ))
+) : (
+    <p>No articles available.</p>
+)}
+
             </div>
 
                
