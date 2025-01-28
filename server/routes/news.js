@@ -41,26 +41,31 @@ router.get("/", authenticateToken, async (req, res) => {
     const userId = req.user.id;
 
     try {
-        // Fetch user preferences from the database
+        // Fetch disliked articles for the user
+        const dislikedArticlesQuery = await pool.query(
+            "SELECT article_id FROM interactions WHERE user_id = $1 AND interaction_type = 'dislike'",
+            [userId]
+        );
+        const dislikedArticleIds = dislikedArticlesQuery.rows.map((row) => row.article_id);
+
+        // Fetch user preferences
         const preferences = await pool.query(
             "SELECT topic FROM preferences WHERE user_id = $1",
             [userId]
         );
 
         const categories = preferences.rows.map((row) => row.topic);
-        if (categories.length === 0) {
-            return res.status(400).json({ error: "No preferences set for this user." });
-        }
+        const allCategories = [...categories, "general"]; // Include fallback category
 
         // Call NewsAPI for each category
         const apiKey = process.env.NEWS_API_KEY;
-        const promises = categories.map((category) =>
+        const promises = allCategories.map((category) =>
             axios.get(`https://newsapi.org/v2/top-headlines`, {
                 params: {
                     category,
                     apiKey,
                     language: "en",
-                    pageSize: 5, // Limit results per category
+                    pageSize: 10,
                 },
             })
         );
@@ -74,14 +79,41 @@ router.get("/", authenticateToken, async (req, res) => {
                 id: article.id || article.url || `unknown-${index}`,
             }))
         );
-        
-        
-        res.json(articles);
+
+        // Filter out disliked articles
+        let filteredArticles = articles.filter(
+            (article) => !dislikedArticleIds.includes(article.id)
+        );
+
+        // Fallback: If no articles remain, fetch general articles only
+        if (filteredArticles.length === 0) {
+            const fallbackResponse = await axios.get(
+                `https://newsapi.org/v2/top-headlines`, {
+                    params: {
+                        category: "general",
+                        apiKey,
+                        language: "en",
+                        pageSize: 10,
+                    },
+                }
+            );
+            filteredArticles = fallbackResponse.data.articles.map((article, index) => ({
+                ...article,
+                id: article.id || article.url || `unknown-${index}`,
+            }));
+        }
+
+        // Shuffle and limit results
+        const shuffledArticles = filteredArticles.sort(() => Math.random() - 0.5);
+
+        res.json(shuffledArticles.slice(0, 20));
     } catch (err) {
         console.error("Error fetching news:", err.message);
         res.status(500).json({ error: "Failed to fetch news" });
     }
 });
+
+
 
 router.post("/interactions", authenticateToken, async (req, res) => {
     const { articleId, action } = req.body; // Action: "click", "like", "dislike"
