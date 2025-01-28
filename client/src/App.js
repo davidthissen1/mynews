@@ -4,7 +4,8 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import NewsFeed from "./components/NewsFeed";
 import SelectInterests from "./components/SelectInterests";
-import NavBar from "./components/NavBar"; // Import NavBar
+
+import './App.css';
 
 const App = () => {
   const isLoggedIn = !!localStorage.getItem("token"); // Check if token exists
@@ -28,7 +29,7 @@ const App = () => {
               path="/news"
               element={
                 <>
-                  <NavBar />
+                  
                   <NewsFeed />
                 </>
               }

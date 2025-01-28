@@ -11,7 +11,6 @@ const NewsFeed = () => {
         const fetchNews = async () => {
             const token = localStorage.getItem("token");
             if (!token) {
-                // Redirect to login if no token is found
                 navigate("/login");
                 return;
             }
@@ -23,7 +22,6 @@ const NewsFeed = () => {
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log("Articles from API:", data);
                     setArticles(data);
                 } else {
                     const errorData = await response.json();
@@ -39,16 +37,16 @@ const NewsFeed = () => {
     }, [navigate]);
 
     const handleLogout = () => {
-        localStorage.removeItem("token"); // Clear the token
-        navigate("/login"); // Redirect to login page
+        localStorage.removeItem("token");
+        navigate("/login");
     };
 
     return (
-        <div className="container mt-5">
+        <div className="container py-5">
             {/* Header */}
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h1 className="text-primary">Your Personalized News Feed</h1>
-                <button className="btn btn-danger" onClick={handleLogout}>
+            <div className="d-flex justify-content-between align-items-center mb-5">
+                <h1 className="text-primary fw-bold">Your Personalized News Feed</h1>
+                <button className="btn btn-danger px-4 py-2" onClick={handleLogout}>
                     Logout
                 </button>
             </div>
@@ -57,20 +55,15 @@ const NewsFeed = () => {
             {error && <p className="text-danger">{error}</p>}
 
             {/* Articles */}
-            <div className="row">
+            <div className="row gy-4">
                 {articles.length > 0 ? (
                     articles.map((article, index) => (
-                        <div key={article.url || `unknown-${index}`} className="col-md-4 mb-4">
-                            <ArticleCard
-                                article={{
-                                    ...article,
-                                    id: article.id || article.url || `unknown-${index}`,
-                                }}
-                            />
+                        <div key={index} className="col-lg-4 col-md-6">
+                            <ArticleCard article={article} />
                         </div>
                     ))
                 ) : (
-                    <p>No articles available.</p>
+                    <p className="text-center">No articles available.</p>
                 )}
             </div>
         </div>

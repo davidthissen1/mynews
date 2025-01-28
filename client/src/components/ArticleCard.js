@@ -1,18 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 
 const ArticleCard = ({ article }) => {
+    const [like, setLike] = useState(false); // Tracks the "Like" state
+    const [dislike, setDislike] = useState(false); // Tracks the "Dislike" state
+
     const logInteraction = async (articleId, action) => {
-        if (!articleId) {
-            console.error("Invalid articleId:", articleId);
-            return;
-        }
-
-        console.log("Logging interaction:", "articleId=", articleId, ", action=", action);
-
         const token = localStorage.getItem("token");
+        if (!articleId) return;
 
         try {
-            const response = await fetch("http://localhost:5501/api/interactions", {
+            await fetch("http://localhost:5501/api/interactions", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -20,55 +17,68 @@ const ArticleCard = ({ article }) => {
                 },
                 body: JSON.stringify({ articleId, action }),
             });
-
-            if (!response.ok) {
-                console.error("Failed to log interaction");
-            }
         } catch (err) {
-            console.error("Error:", err);
+            console.error("Error logging interaction:", err);
         }
     };
 
+    const handleLike = () => {
+        setLike(!like); // Toggle "Like" state
+        if (!like) setDislike(false); // Reset "Dislike" if switching to "Like"
+        logInteraction(article.id, "like");
+    };
+
+    const handleDislike = () => {
+        setDislike(!dislike); // Toggle "Dislike" state
+        if (!dislike) setLike(false); // Reset "Like" if switching to "Dislike"
+        logInteraction(article.id, "dislike");
+    };
+
     return (
-        <div className="card shadow-sm h-100">
+        <div className="card shadow-sm rounded-4 h-100">
             {/* Article Image */}
             {article.image && (
                 <img
                     src={article.image}
-                    className="card-img-top"
+                    className="card-img-top rounded-top-4"
                     alt="Article"
                     style={{ height: "200px", objectFit: "cover" }}
                 />
             )}
 
             <div className="card-body d-flex flex-column">
-                {/* Article Title */}
+                {/* Title */}
                 <h5 className="card-title text-dark">{article.title}</h5>
 
-                {/* Article Summary */}
+                {/* Summary */}
                 <p className="card-text text-secondary">
                     {article.summary || "No summary available."}
                 </p>
 
-                {/* Interaction Buttons */}
-                <div className="mt-auto">
+                {/* Buttons */}
+                <div className="mt-auto d-flex justify-content-between">
+                    {/* Like Button */}
                     <button
-                        className="btn btn-outline-success me-2"
-                        onClick={() => logInteraction(article.id, "like")}
+                        className={`btn ${like ? "btn-success" : "btn-outline-success"} btn-sm d-flex align-items-center`}
+                        onClick={handleLike}
                     >
-                        Like
+                        <i className="bi bi-hand-thumbs-up me-2"></i> Like
                     </button>
+
+                    {/* Dislike Button */}
                     <button
-                        className="btn btn-outline-danger me-2"
-                        onClick={() => logInteraction(article.id, "dislike")}
+                        className={`btn ${dislike ? "btn-danger" : "btn-outline-danger"} btn-sm d-flex align-items-center`}
+                        onClick={handleDislike}
                     >
-                        Dislike
+                        <i className="bi bi-hand-thumbs-down me-2"></i> Dislike
                     </button>
+
+                    {/* Read More Link */}
                     <a
                         href={article.id}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn btn-primary"
+                        className="btn btn-primary btn-sm"
                         onClick={() => logInteraction(article.id, "click")}
                     >
                         Read More
