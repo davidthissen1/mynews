@@ -1,4 +1,4 @@
-export const logInteraction = async (articleId, action) => {
+export const logInteraction = async (articleUrl, action) => {
     const token = localStorage.getItem("token");
 
     try {
@@ -8,7 +8,7 @@ export const logInteraction = async (articleId, action) => {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ articleId, action }),
+            body: JSON.stringify({ articleUrl, action }),
         });
 
         if (!response.ok) {

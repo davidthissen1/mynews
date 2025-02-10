@@ -4,10 +4,10 @@ const ArticleCard = ({ article }) => {
     const [like, setLike] = useState(false); // Tracks the "Like" state
     const [dislike, setDislike] = useState(false); // Tracks the "Dislike" state
 
-    const logInteraction = async (articleId, action) => {
+    const logInteraction = async (articleUrl, action) => {
         const token = localStorage.getItem("token");
-        if (!articleId) return;
-
+        if (!articleUrl) return;
+    
         try {
             await fetch("http://localhost:5501/api/interactions", {
                 method: "POST",
@@ -15,7 +15,7 @@ const ArticleCard = ({ article }) => {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ articleId, action }),
+                body: JSON.stringify({ articleUrl, action }),
             });
         } catch (err) {
             console.error("Error logging interaction:", err);
@@ -25,13 +25,13 @@ const ArticleCard = ({ article }) => {
     const handleLike = () => {
         setLike(!like); // Toggle "Like" state
         if (!like) setDislike(false); // Reset "Dislike" if switching to "Like"
-        logInteraction(article.id, "like");
+        logInteraction(article.url, "like");
     };
 
     const handleDislike = () => {
         setDislike(!dislike); // Toggle "Dislike" state
         if (!dislike) setLike(false); // Reset "Like" if switching to "Dislike"
-        logInteraction(article.id, "dislike");
+        logInteraction(article.url, "dislike");
     };
 
     return (
