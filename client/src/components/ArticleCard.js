@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import defaultImage from '../assets/news.jpeg'; // Add a default image
+import './ArticleCard.css';
 
 
 const ArticleCard = ({ article }) => {
@@ -68,42 +69,46 @@ const ArticleCard = ({ article }) => {
     };
 
     return (
-        <div className="card shadow-sm rounded-4 h-100">
-            <div className="image-container">
+        <div className="news-card">
+            <div className="news-card__image-container">
                 <img
                     src={imageError ? defaultImage : (article.urlToImage || defaultImage)}
-                    className="card-img-top rounded-top-4"
                     alt={article.title}
                     onError={() => setImageError(true)}
-                    style={{
-                        height: '200px',
-                        objectFit: 'cover',
-                        width: '100%'
-                    }}
+                    className="news-card__image"
                 />
-</div>
-            <div className="card-body">
-                <h5 className="card-title">{article.title}</h5>
-                <p className="card-text">{article.description}</p>
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="news-card__overlay">
+                    <span className="news-card__source">{article.source?.name}</span>
+                </div>
+            </div>
+            <div className="news-card__content">
+                <div className="news-card__meta">
+                    <span className="news-card__date">
+                        {new Date(article.publishedAt).toLocaleDateString()}
+                    </span>
+                </div>
+                <h3 className="news-card__title">{article.title}</h3>
+                <p className="news-card__description">{article.description}</p>
+                <div className="news-card__actions">
                     <button
-                        className={`btn ${like ? "btn-success" : "btn-outline-success"} btn-sm d-flex align-items-center`}
+                        className={`action-btn ${like ? 'action-btn--liked' : ''}`}
                         onClick={handleLike}
                     >
-                        <i className="bi bi-hand-thumbs-up me-2"></i> Like
+                        <i className="bi bi-hand-thumbs-up"></i>
+                        <span>Like</span>
                     </button>
                     <button
-                        className={`btn ${dislike ? "btn-danger" : "btn-outline-danger"} btn-sm d-flex align-items-center`}
+                        className={`action-btn ${dislike ? 'action-btn--disliked' : ''}`}
                         onClick={handleDislike}
                     >
-                        <i className="bi bi-hand-thumbs-down me-2"></i> Dislike
+                        <i className="bi bi-hand-thumbs-down"></i>
+                        <span>Dislike</span>
                     </button>
                     <a
                         href={article.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn btn-primary btn-sm"
-                        onClick={() => logInteraction(article.url, "click")}
+                        className="action-btn action-btn--read"
                     >
                         Read More
                     </a>

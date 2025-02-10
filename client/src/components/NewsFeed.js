@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ArticleCard from "./ArticleCard"; // Ensure correct path to ArticleCard
+import './NewsFeed.css';
 
 const NewsFeed = () => {
     const [articles, setArticles] = useState([]);
@@ -42,29 +43,18 @@ const NewsFeed = () => {
     };
 
     return (
-        <div className="container py-5">
-            {/* Header */}
-            <div className="d-flex justify-content-between align-items-center mb-5">
-                <h1 className="text-primary fw-bold">Your Personalized News Feed</h1>
-                <button className="btn btn-danger px-4 py-2" onClick={handleLogout}>
+        <div className="news-feed-container">
+            <nav className="nav-bar">
+                <h1 className="nav-title">MyNews</h1>
+                <button onClick={handleLogout} className="logout-btn">
+                    <i className="bi bi-box-arrow-right"></i>
                     Logout
                 </button>
-            </div>
-
-            {/* Error Message */}
-            {error && <p className="text-danger">{error}</p>}
-
-            {/* Articles */}
-            <div className="row gy-4">
-                {articles.length > 0 ? (
-                    articles.map((article, index) => (
-                        <div key={index} className="col-lg-4 col-md-6">
-                            <ArticleCard article={article} />
-                        </div>
-                    ))
-                ) : (
-                    <p className="text-center">No articles available.</p>
-                )}
+            </nav>
+            <div className="news-feed">
+                {articles.map((article, index) => (
+                    <ArticleCard key={index} article={article} />
+                ))}
             </div>
         </div>
     );
