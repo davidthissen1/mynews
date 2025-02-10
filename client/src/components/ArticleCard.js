@@ -7,7 +7,8 @@ const ArticleCard = ({ article }) => {
 
     const [like, setLike] = useState(false); // Tracks the "Like" state
     const [dislike, setDislike] = useState(false); // Tracks the "Dislike" state
-    
+    const [currentInteraction, setCurrentInteraction] = useState(null);
+
     const handleImageError = () => {
         setImageError(true);
     };
@@ -15,31 +16,55 @@ const ArticleCard = ({ article }) => {
     const logInteraction = async (articleUrl, action) => {
         const token = localStorage.getItem("token");
         if (!articleUrl) return;
-    
+
         try {
-            await fetch("http://localhost:5501/api/interactions", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ articleUrl, action }),
-            });
+            if (currentInteraction === action) {
+                // If same action, remove the interaction
+                setCurrentInteraction(null);
+                await fetch("http://localhost:5501/api/interactions", {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ articleUrl }),
+                });
+            } else {
+                // New interaction
+                setCurrentInteraction(action);
+                await fetch("http://localhost:5501/api/interactions", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({ articleUrl, action }),
+                });
+            }
         } catch (err) {
             console.error("Error logging interaction:", err);
         }
     };
-
     const handleLike = () => {
-        setLike(!like); // Toggle "Like" state
-        if (!like) setDislike(false); // Reset "Dislike" if switching to "Like"
-        logInteraction(article.url, "like");
+        if (like) {
+            setLike(false);
+            setCurrentInteraction(null);
+        } else {
+            setLike(true);
+            setDislike(false);
+            logInteraction(article.url, "like");
+        }
     };
 
     const handleDislike = () => {
-        setDislike(!dislike); // Toggle "Dislike" state
-        if (!dislike) setLike(false); // Reset "Like" if switching to "Dislike"
-        logInteraction(article.url, "dislike");
+        if (dislike) {
+            setDislike(false);
+            setCurrentInteraction(null);
+        } else {
+            setDislike(true);
+            setLike(false);
+            logInteraction(article.url, "dislike");
+        }
     };
 
     return (
