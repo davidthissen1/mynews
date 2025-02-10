@@ -1,8 +1,16 @@
 import React, { useState } from "react";
+import defaultImage from '../assets/news.jpeg'; // Add a default image
+
 
 const ArticleCard = ({ article }) => {
+    const [imageError, setImageError] = useState(false);
+
     const [like, setLike] = useState(false); // Tracks the "Like" state
     const [dislike, setDislike] = useState(false); // Tracks the "Dislike" state
+    
+    const handleImageError = () => {
+        setImageError(true);
+    };
 
     const logInteraction = async (articleUrl, action) => {
         const token = localStorage.getItem("token");
@@ -36,50 +44,41 @@ const ArticleCard = ({ article }) => {
 
     return (
         <div className="card shadow-sm rounded-4 h-100">
-            {/* Article Image */}
-            {article.image && (
+            <div className="image-container">
                 <img
-                    src={article.image}
+                    src={imageError ? defaultImage : (article.urlToImage || defaultImage)}
                     className="card-img-top rounded-top-4"
-                    alt="Article"
-                    style={{ height: "200px", objectFit: "cover" }}
+                    alt={article.title}
+                    onError={() => setImageError(true)}
+                    style={{
+                        height: '200px',
+                        objectFit: 'cover',
+                        width: '100%'
+                    }}
                 />
-            )}
-
-            <div className="card-body d-flex flex-column">
-                {/* Title */}
-                <h5 className="card-title text-dark">{article.title}</h5>
-
-                {/* Summary */}
-                <p className="card-text text-secondary">
-                    {article.summary || "No summary available."}
-                </p>
-
-                {/* Buttons */}
-                <div className="mt-auto d-flex justify-content-between">
-                    {/* Like Button */}
+</div>
+            <div className="card-body">
+                <h5 className="card-title">{article.title}</h5>
+                <p className="card-text">{article.description}</p>
+                <div className="d-flex justify-content-between align-items-center">
                     <button
                         className={`btn ${like ? "btn-success" : "btn-outline-success"} btn-sm d-flex align-items-center`}
                         onClick={handleLike}
                     >
                         <i className="bi bi-hand-thumbs-up me-2"></i> Like
                     </button>
-
-                    {/* Dislike Button */}
                     <button
                         className={`btn ${dislike ? "btn-danger" : "btn-outline-danger"} btn-sm d-flex align-items-center`}
                         onClick={handleDislike}
                     >
                         <i className="bi bi-hand-thumbs-down me-2"></i> Dislike
                     </button>
-
-                    {/* Read More Link */}
                     <a
-                        href={article.id}
+                        href={article.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="btn btn-primary btn-sm"
-                        onClick={() => logInteraction(article.id, "click")}
+                        onClick={() => logInteraction(article.url, "click")}
                     >
                         Read More
                     </a>
